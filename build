@@ -31,13 +31,13 @@ $avrdude/avrdude.exe -CC:$avrdude/avrdude.conf -v -patmega328p -carduino -PCOM3 
 
 function fall {
 	case "$platform" in
-				avr)
-					fmake
-					fburnavr
-					;;
-				*)
-					fmake
-					;;
+		avr)
+			fmake
+			fburnavr
+			;;
+	          *)
+			fmake
+			;;
 	esac
 }
 
@@ -50,13 +50,13 @@ else
                         ;;
                 burn)
                         case "$platform" in
-									avr)
-										fburnavr
-										;;
-									  
-									  *)
-										;;
-						esac
+				avr)
+					fburnavr
+					;;
+							  
+				  *)
+					;;
+			esac
                         ;;
                    *)
                         echo Invalid Option
