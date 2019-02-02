@@ -2,31 +2,36 @@
 language=$(pwd | awk -F/ '{print $(NF-2)}')
 platform=$(pwd | awk -F/ '{print $(NF-1)}')
 project=$(pwd  | awk -F/ '{print $(NF)}')
-buildtools=../../../buildtools/$language/$platform
+devdirprefix=/mnt/c/Users/VarunMohan/dev
+buildtools="$devdirprefix"/buildtools/"$language"/"$platform"
 compileserver=acer
 compilerootprefix=/home/varun/coding
-compileroot=$compilerootprefix/$language/$platform
-avrdude=../../../tools/avrdude
+compileroot="$compilerootprefix"/"$language"/"$platform"
 
-if [ $buildtools/Makefile -nt Makefile ];then
+#AVR Specific configurations
+avrdude="$devdirprefix"/tools/avrdude
+avrconf=C:\\Users\\VarunMohan\\dev\\tools\\avrdude\\avrdude.conf
+##
+
+if [ "$buildtools"/Makefile -nt Makefile ];then
 	echo "Copying newer Makefile from buildtools."
-	cp $buildtools/Makefile .
+	cp "$buildtools"/Makefile .
 else
 	echo "Makefile is uptodate. No need to copy."
 fi
 
 function fmake {
-echo Project is $project
-echo Syncing files with complie server : $compileserver
-rsync -aPq --delete --exclude=".*" --exclude="tmp" --exclude="bin"  ../$project varun@$compileserver:$compileroot
+echo Project is "$project"
+echo Syncing files with complie server : "$compileserver"
+rsync -aPq --delete --exclude=".*" --exclude="tmp" --exclude="bin"  ../"$project" varun@"$compileserver":"$compileroot"
 echo Running make on target
 ssh acer "cd $compileroot/$project;mkdir -p tmp bin;make"
 echo Copy binary back to us
-rsync -aq  acer:$compileroot/$project/bin/$project* bin/
+rsync -aq  acer:"$compileroot"/"$project"/bin/"$project"* bin/
 }
 
 function fburnavr {
-$avrdude/avrdude.exe -CC:$avrdude/avrdude.conf -v -patmega328p -carduino -PCOM3 -b115200 -D -Uflash:w:bin/$project.hex:i
+"$avrdude"/avrdude.exe -C"$avrconf" -v -patmega328p -carduino -PCOM3 -b115200 -D -Uflash:w:bin/"$project".hex:i
 }
 
 function fall {
