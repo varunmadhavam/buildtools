@@ -1,0 +1,6 @@
+#!/bin/bash
+language=$(pwd | awk -F/ '{print $(NF-2)}')
+platform=$(pwd | awk -F/ '{print $(NF-1)}')
+project=$(pwd | awk -F/ '{print $(NF)}')
+
+
