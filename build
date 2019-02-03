@@ -1,12 +1,25 @@
 #!/bin/bash
+workdir=$(pwd | awk -F/ '{print $(NF-3)}')
+if [ "$workdir" != "dev" ];then
+	echo "Seems like a wrong directory"
+	exit
+fi
+
 language=$(pwd | awk -F/ '{print $(NF-2)}')
 platform=$(pwd | awk -F/ '{print $(NF-1)}')
 project=$(pwd  | awk -F/ '{print $(NF)}')
 devdirprefix=/mnt/c/Users/VarunMohan/dev
 buildtools="$devdirprefix"/buildtools/"$language"/"$platform"
-compileserver=acer
+
+compileserverip=192.168.2.149
 compilerootprefix=/home/varun/coding
 compileroot="$compilerootprefix"/"$language"/"$platform"
+
+if [ `ip route get $compileserverip | grep via | wc -l` == 0 ];then
+	compileserver=acer2
+else
+	compileserver=acer1
+fi
 
 #AVR Specific configurations
 avrdude="$devdirprefix"/tools/avrdude
@@ -25,9 +38,9 @@ echo Project is "$project"
 echo Syncing files with complie server : "$compileserver"
 rsync -aPq --delete --exclude=".*" --exclude="tmp" --exclude="bin"  ../"$project" varun@"$compileserver":"$compileroot"
 echo Running make on target
-ssh acer "cd $compileroot/$project;mkdir -p tmp bin;make"
+ssh  "$compileserver" "cd $compileroot/$project;mkdir -p tmp bin;make"
 echo Copy binary back to us
-rsync -aq  acer:"$compileroot"/"$project"/bin/"$project"* bin/
+rsync -aq  "$compileserver":"$compileroot"/"$project"/bin/"$project"* bin/
 }
 
 function fburnavr {
@@ -55,13 +68,13 @@ else
                         ;;
                 burn)
                         case "$platform" in
-				avr)
-					fburnavr
-					;;
+							avr)
+								fburnavr
+								;;
 							  
-				  *)
-					;;
-			esac
+							  *)
+								;;
+						esac
                         ;;
                    *)
                         echo Invalid Option
