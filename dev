@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ `ip route get 192.168.2.149 | grep via | wc -l` == 0 ];then
+	compileserver=acer2
+else
+	compileserver=acer1
+fi
+ssh $compileserver
